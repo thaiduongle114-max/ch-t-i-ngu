@@ -32,6 +32,13 @@ with open("player.png", "rb") as f:
 
 
 # ============================================================
+# ẢNH NỀN SẢNH CHỜ — BỔ SUNG, KHÔNG THAY ĐỔI CODE CŨ
+# ============================================================
+with open("lobby.png", "rb") as f:
+    lobby_url = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+
+
+# ============================================================
 # GAME
 # ============================================================
 
@@ -1910,6 +1917,46 @@ function draw() {
 
 
 // ============================================================
+// BỔ SUNG ẢNH NỀN SẢNH CHỜ — KHÔNG SỬA CODE CŨ
+// ============================================================
+const lobbyBackgroundImg = new Image();
+lobbyBackgroundImg.src = "LOBBY_IMAGE_HERE";
+
+// Lưu hàm nền gốc để các màn chơi vẫn dùng nền cũ.
+const originalDrawBackgroundForLobby = drawBackground;
+drawBackground = function () {
+    if (gameState === "MENU" &&
+        lobbyBackgroundImg.complete &&
+        lobbyBackgroundImg.naturalWidth > 0) {
+        const canvasRatio = canvas.width / canvas.height;
+        const imageRatio = lobbyBackgroundImg.naturalWidth / lobbyBackgroundImg.naturalHeight;
+        let drawWidth, drawHeight, drawX, drawY;
+
+        // Phủ kín canvas, giữ đúng tỷ lệ ảnh.
+        if (imageRatio > canvasRatio) {
+            drawHeight = canvas.height;
+            drawWidth = drawHeight * imageRatio;
+            drawX = (canvas.width - drawWidth) / 2;
+            drawY = 0;
+        } else {
+            drawWidth = canvas.width;
+            drawHeight = drawWidth / imageRatio;
+            drawX = 0;
+            drawY = (canvas.height - drawHeight) / 2;
+        }
+
+        ctx.drawImage(lobbyBackgroundImg, drawX, drawY, drawWidth, drawHeight);
+        // Lớp tối nhẹ để chữ và thẻ độ khó dễ nhìn.
+        ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+
+    // Nếu không ở sảnh chờ, giữ nguyên nền gốc của game.
+    originalDrawBackgroundForLobby();
+};
+
+// ============================================================
 // GAME LOOP
 // ============================================================
 
@@ -1958,6 +2005,12 @@ game_html = game_html.replace(
 game_html = game_html.replace(
     "PLAYER_IMAGE_HERE",
     player_url
+)
+
+
+game_html = game_html.replace(
+    "LOBBY_IMAGE_HERE",
+    lobby_url
 )
 
 
