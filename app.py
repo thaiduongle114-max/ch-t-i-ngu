@@ -12,7 +12,7 @@ st.caption("Nhấn SPACE hoặc Click chuột để nhảy qua các chướng ng
 
 
 # ============================================================
-# ĐỌC FILE ÂM THANH + TROLL FACE
+# ĐỌC FILE ÂM THANH + TROLL FACE + NỀN SẢNH CHỜ
 # ============================================================
 
 with open("pop_star.mp3", "rb") as f:
@@ -29,6 +29,17 @@ with open("trollface.png", "rb") as f:
 
 with open("player.png", "rb") as f:
     player_url = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+
+# Tải ảnh nền sảnh chờ (Thêm code đọc file ảnh sảnh chờ)
+try:
+    with open("loppy.png.webp", "rb") as f:
+        lobby_bg_url = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+except FileNotFoundError:
+    try:
+        with open("loppy.png", "rb") as f:
+            lobby_bg_url = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+    except FileNotFoundError:
+        lobby_bg_url = ""
 
 
 # ============================================================
@@ -148,6 +159,14 @@ playerImg.src = "PLAYER_IMAGE_HERE";
 const trollImg = new Image();
 
 trollImg.src = "TROLL_FACE_HERE";
+
+
+// ============================================================
+// LOBBY BACKGROUND IMAGE
+// ============================================================
+
+const lobbyBgImg = new Image();
+lobbyBgImg.src = "LOBBY_BG_HERE";
 
 
 // ============================================================
@@ -1070,8 +1089,15 @@ function drawMenuCube(x, y, size, rotation, color) {
 }
 
 function drawLobby() {
-    // Nền xanh đen neon, không sử dụng ảnh nền tím.
-    drawBackground();
+    // Vẽ ảnh nền sảnh chờ nếu khả dụng, nếu không vẽ nền động mặc định
+    if (lobbyBgImg.complete && lobbyBgImg.naturalWidth > 0) {
+        ctx.drawImage(lobbyBgImg, 0, 0, canvas.width, canvas.height);
+        // Phủ lớp overlay nhẹ để giữ nét giao diện
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+        drawBackground();
+    }
     const pulse = 0.75 + Math.sin(performance.now() / 260) * 0.15;
 
     // Header logo.
@@ -1958,6 +1984,11 @@ game_html = game_html.replace(
 game_html = game_html.replace(
     "PLAYER_IMAGE_HERE",
     player_url
+)
+
+game_html = game_html.replace(
+    "LOBBY_BG_HERE",
+    lobby_bg_url
 )
 
 
